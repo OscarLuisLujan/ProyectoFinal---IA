@@ -4,7 +4,7 @@ Este repositorio contiene un sistema inteligente diseñado para el **Gobierno Au
 
 ---
 
-## 🚀 Características Principales
+## Características Principales
 
 *   **Evaluación Multivariable:** Procesamiento de 28 variables técnicas estructuradas para el cálculo del índice de riesgo estructural ($RN_{29}$) sobre 100 puntos.
 *   **Core de Inteligencia Artificial:** Dos redes neuronales tipo Perceptrón Multicapa (MLP); una para la clasificación del riesgo (Precisión > 97%) y otra para la regresión del índice matemático (MAE < 2%).
@@ -13,7 +13,7 @@ Este repositorio contiene un sistema inteligente diseñado para el **Gobierno Au
 
 ---
 
-## 📊 Arquitectura del Sistema
+## Arquitectura del Sistema
 
 El flujo de información se procesa a través de una estructura jerárquica que elimina el sesgo subjetivo del inspector en campo:
 
