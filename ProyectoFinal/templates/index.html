@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAMLP - Priorización Inteligente de Inspecciones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-logo">
+                <svg class="icon-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 21h18M3 10h18M5 21V10m14 11V10M8 21v-4a2 2 0 012-2h4a2 2 0 012 2v4M2 10l10-8 10 8" />
+                </svg>
+                <div class="logo-text">
+                    <h1>GOBIERNO AUTÓNOMO MUNICIPAL DE LA PAZ</h1>
+                    <p>Secretaría Municipal de Gestión Integral de Riesgos (SMGIR)</p>
+                </div>
+                <button id="theme-toggle" class="theme-btn">🌙 Dark</button>
+            </div>
+            <div class="header-badge">
+                <span class="pulse-indicator"></span>
+                <span>Red Neuronal Activa (RN29)</span>
+            </div>
+        </header>
+
+        <!-- DASHBOARD GRID -->
+        <main class="app-dashboard">
+            <!-- LEFT COLUMN: INPUT FORM -->
+            <section class="card form-section">
+                <div class="section-title-wrapper">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <h2>Evaluación Técnica de Obra</h2>
+                </div>
+
+                <!-- DRAG AND DROP ZONE -->
+                <div class="drag-drop-container">
+                    <div class="drag-drop-zone" id="drop-zone">
+                        <input type="file" id="file-input" accept="image/*" class="file-hidden">
+                        <svg class="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
+                        </svg>
+                        <p class="drag-drop-text">Arrastre una fotografía estructural aquí o haga clic para buscar</p>
+                        <p class="drag-drop-subtext">OpenCV analizará grietas, humedad y deformaciones de forma automática</p>
+                    </div>
+                    <div class="image-preview-container hidden" id="preview-container">
+                        <img src="" alt="Vista previa de imagen" id="image-preview" class="preview-img">
+                        <div class="preview-details">
+                            <span class="preview-filename" id="preview-filename">nombre_archivo.jpg</span>
+                            <button class="btn-remove-image" id="btn-remove-img" type="button">Quitar imagen</button>
+                        </div>
+                        <div class="ia-badge-extracting hidden" id="ia-loading">
+                            <span class="spinner"></span> Procesando con Visión Artificial...
+                        </div>
+                        <div class="ia-badge-extracted hidden" id="ia-success">
+                            <span>✓ Características extraídas con éxito por la IA</span>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <form id="evaluation-form" class="evaluation-form">
+                    
+                    <div class="tabs-header">
+                        <button type="button" class="tab-btn active">Información General</button>
+                        <button type="button" class="tab-btn">Estado Estructural</button>
+                        <button type="button" class="tab-btn">Humedad y Drenaje</button>
+                        <button type="button" class="tab-btn">Terreno y Topografía</button>
+                        <button type="button" class="tab-btn">Entorno y IA</button>
+                    </div>
+
+                    <!-- TAB 0: INFORMACIÓN GENERAL -->
+                    <div class="tab-content active" id="tab-0">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="RN1_antiguedad">Antigüedad</label>
+                                <select id="RN1_antiguedad" name="RN1_antiguedad" required>
+                                    <option value="0">0 - 5 años</option>
+                                    <option value="1">6 - 15 años</option>
+                                    <option value="2">16 - 30 años</option>
+                                    <option value="3">31 - 50 años</option>
+                                    <option value="4">Más de 50 años</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN2_numero_pisos">Número de pisos</label>
+                                <select id="RN2_numero_pisos" name="RN2_numero_pisos" required>
+                                    <option value="0">1 piso</option>
+                                    <option value="1">2 - 3 pisos</option>
+                                    <option value="2">4 - 5 pisos</option>
+                                    <option value="3">6 - 8 pisos</option>
+                                    <option value="4">Más de 8 pisos</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN3_tipo_construccion">Tipo de construcción</label>
+                                <select id="RN3_tipo_construccion" name="RN3_tipo_construccion" required>
+                                    <option value="0">Vivienda</option>
+                                    <option value="1">Edificio</option>
+                                    <option value="2">Comercial</option>
+                                    <option value="3">Industrial</option>
+                                    <option value="4">Otro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN4_estado_conservacion">Estado de conservación</label>
+                                <select id="RN4_estado_conservacion" name="RN4_estado_conservacion" required>
+                                    <option value="0">Muy Bueno</option>
+                                    <option value="1">Bueno</option>
+                                    <option value="2">Regular</option>
+                                    <option value="3">Malo</option>
+                                    <option value="4">Muy Malo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 1: ESTRUCTURAL -->
+                    <div class="tab-content" id="tab-1">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="RN5_tamano_grietas">Tamaño de grietas</label>
+                                <select id="RN5_tamano_grietas" name="RN5_tamano_grietas" required>
+                                    <option value="0">0 mm</option>
+                                    <option value="1">&lt; 1 mm</option>
+                                    <option value="2">1 mm - 2 mm</option>
+                                    <option value="3">3 mm - 5 mm</option>
+                                    <option value="4">6 mm - 10 mm</option>
+                                    <option value="5">&gt; 10 mm</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN6_cantidad_grietas">Cantidad de grietas</label>
+                                <select id="RN6_cantidad_grietas" name="RN6_cantidad_grietas" required>
+                                    <option value="0">0</option>
+                                    <option value="1">1 - 2</option>
+                                    <option value="2">3 - 5</option>
+                                    <option value="3">6 - 10</option>
+                                    <option value="4">&gt; 10</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN7_evolucion_grietas">Evolución de grietas</label>
+                                <select id="RN7_evolucion_grietas" name="RN7_evolucion_grietas" required>
+                                    <option value="0">Inactivas</option>
+                                    <option value="1">Crecimiento anual</option>
+                                    <option value="2">Crecimiento semestral</option>
+                                    <option value="3">Crecimiento mensual</option>
+                                    <option value="4">Crecimiento semanal</option>
+                                    <option value="5">Crecimiento diario</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN8_inclinacion_muros">Inclinación de muros</label>
+                                <select id="RN8_inclinacion_muros" name="RN8_inclinacion_muros" required>
+                                    <option value="0">0°</option>
+                                    <option value="1">&lt; 1°</option>
+                                    <option value="2">1° - 2°</option>
+                                    <option value="3">2° - 3°</option>
+                                    <option value="4">3° - 4°</option>
+                                    <option value="5">4° - 5°</option>
+                                    <option value="6">&gt; 5°</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN9_hundimientos">Hundimientos</label>
+                                <select id="RN9_hundimientos" name="RN9_hundimientos" required>
+                                    <option value="0">Ninguno</option>
+                                    <option value="1">Leve</option>
+                                    <option value="2">Moderado</option>
+                                    <option value="3">Severo</option>
+                                    <option value="4">Crítico</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN10_estado_columnas">Estado de columnas/vigas</label>
+                                <select id="RN10_estado_columnas" name="RN10_estado_columnas" required>
+                                    <option value="0">Óptimo</option>
+                                    <option value="1">Daños estéticos</option>
+                                    <option value="2">Daño moderado</option>
+                                    <option value="3">Daño severo</option>
+                                    <option value="4">Falla crítica</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: HUMEDAD -->
+                    <div class="tab-content" id="tab-2">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="RN11_filtraciones">Filtraciones</label>
+                                <select id="RN11_filtraciones" name="RN11_filtraciones" required>
+                                    <option value="0">Ausente</option>
+                                    <option value="1">Sudoración esporádica</option>
+                                    <option value="2">Exudación pluvial</option>
+                                    <option value="3">Goteo intermitente</option>
+                                    <option value="4">Flujo continuo</option>
+                                    <option value="5">Sifonamiento</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN12_humedad_visible">Humedad visible</label>
+                                <select id="RN12_humedad_visible" name="RN12_humedad_visible" required>
+                                    <option value="0">Seco</option>
+                                    <option value="1">Leve (&lt; 10%)</option>
+                                    <option value="2">Moderada (10% - 30%)</option>
+                                    <option value="3">Severa (&gt; 30%)</option>
+                                    <option value="4">Crítica / Criptoflorescencia</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN13_acumulacion_agua">Acumulación de agua cercana</label>
+                                <select id="RN13_acumulacion_agua" name="RN13_acumulacion_agua" required>
+                                    <option value="0">Sin acumulación</option>
+                                    <option value="1">Muy distante (&gt; 30 m)</option>
+                                    <option value="2">Distante (15 m - 30 m)</option>
+                                    <option value="3">Media (5 m - 15 m)</option>
+                                    <option value="4">Cercana (1 m - 5 m)</option>
+                                    <option value="5">Contacto directo (&lt; 1 m)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN14_estado_drenaje">Estado drenaje pluvial</label>
+                                <select id="RN14_estado_drenaje" name="RN14_estado_drenaje" required>
+                                    <option value="0">Excelente</option>
+                                    <option value="1">Bueno</option>
+                                    <option value="2">Regular</option>
+                                    <option value="3">Malo</option>
+                                    <option value="4">Inexistente</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: TERRENO -->
+                    <div class="tab-content" id="tab-3">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="RN15_ubicacion_ladera">Ubicación en ladera</label>
+                                <select id="RN15_ubicacion_ladera" name="RN15_ubicacion_ladera" required>
+                                    <option value="0">Llanura / Valle</option>
+                                    <option value="1">Meseta superior</option>
+                                    <option value="2">Pie de monte</option>
+                                    <option value="3">Cresta / Borde</option>
+                                    <option value="4">Cuerpo de ladera activa</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN16_pendiente_terreno">Pendiente del terreno</label>
+                                <select id="RN16_pendiente_terreno" name="RN16_pendiente_terreno" required>
+                                    <option value="0">Llana (0% - 2%)</option>
+                                    <option value="1">Suave (3% - 5%)</option>
+                                    <option value="2">Inclinada (6% - 10%)</option>
+                                    <option value="3">Moderada (11% - 15%)</option>
+                                    <option value="4">Fuerte (16% - 25%)</option>
+                                    <option value="5">Muy fuerte (26% - 40%)</option>
+                                    <option value="6">Crítica (&gt; 40%)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN17_erosion_visible">Erosión visible</label>
+                                <select id="RN17_erosion_visible" name="RN17_erosion_visible" required>
+                                    <option value="0">Ninguna</option>
+                                    <option value="1">Incipiente</option>
+                                    <option value="2">Leve</option>
+                                    <option value="3">Moderada</option>
+                                    <option value="4">Grave</option>
+                                    <option value="5">Crítica (Cárcavas)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN18_historial_deslizamientos">Historial deslizamientos</label>
+                                <select id="RN18_historial_deslizamientos" name="RN18_historial_deslizamientos" required>
+                                    <option value="0">Nunca</option>
+                                    <option value="1">Muy antiguo (&gt;10 años)</option>
+                                    <option value="2">Antiguo (5-10 años)</option>
+                                    <option value="3">Intermedio (1-5 años)</option>
+                                    <option value="4">Último año</option>
+                                    <option value="5">Reciente (Meses)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: ENTORNO Y IA -->
+                    <div class="tab-content" id="tab-4">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="RN19_excavaciones_cercanas">Excavaciones cercanas</label>
+                                <select id="RN19_excavaciones_cercanas" name="RN19_excavaciones_cercanas" required>
+                                    <option value="0">Ninguna</option>
+                                    <option value="1">Muy leve</option>
+                                    <option value="2">Leve</option>
+                                    <option value="3">Moderada</option>
+                                    <option value="4">Intensa</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN20_movimiento_tierras">Movimiento de tierras</label>
+                                <select id="RN20_movimiento_tierras" name="RN20_movimiento_tierras" required>
+                                    <option value="0">Ninguno</option>
+                                    <option value="1">Muy leve</option>
+                                    <option value="2">Leve</option>
+                                    <option value="3">Moderado</option>
+                                    <option value="4">Alto</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN21_distancia_construcciones">Distancia a otras construcciones</label>
+                                <select id="RN21_distancia_construcciones" name="RN21_distancia_construcciones" required>
+                                    <option value="0">&gt; 15 metros</option>
+                                    <option value="1">11 a 15 metros</option>
+                                    <option value="2">6 a 10 metros</option>
+                                    <option value="3">3 a 5 metros</option>
+                                    <option value="4">0 a 2 metros</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN22_densidad_edificaciones">Densidad edificaciones</label>
+                                <select id="RN22_densidad_edificaciones" name="RN22_densidad_edificaciones" required>
+                                    <option value="0">Muy Baja</option>
+                                    <option value="1">Baja</option>
+                                    <option value="2">Media</option>
+                                    <option value="3">Alta</option>
+                                    <option value="4">Muy Alta</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN23_denuncias_previas">Denuncias previas</label>
+                                <select id="RN23_denuncias_previas" name="RN23_denuncias_previas" required>
+                                    <option value="0">0 a 10 denuncias</option>
+                                    <option value="1">11 a 20 denuncias</option>
+                                    <option value="2">21 a 30 denuncias</option>
+                                    <option value="3">31 a 40 denuncias</option>
+                                    <option value="4">41 a 50 denuncias</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN24_observaciones_municipales">Observaciones municipales</label>
+                                <select id="RN24_observaciones_municipales" name="RN24_observaciones_municipales" required>
+                                    <option value="0">0 a 4</option>
+                                    <option value="1">5 a 8</option>
+                                    <option value="2">9 a 12</option>
+                                    <option value="3">13 a 16</option>
+                                    <option value="4">17 a 20</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="RN25_reparaciones_realizadas">Reparaciones realizadas</label>
+                                <select id="RN25_reparaciones_realizadas" name="RN25_reparaciones_realizadas" required>
+                                    <option value="0">Ninguna</option>
+                                    <option value="1">Cosmética/Estética</option>
+                                    <option value="2">Mantenimiento menor</option>
+                                    <option value="3">Refuerzo parcial</option>
+                                    <option value="4">Refuerzo mayor</option>
+                                    <option value="5">Reconstrucción total</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="ia-subgroup" style="margin-top: 1rem;">
+                            <div class="ia-header-sub">
+                                <h3 class="block-title">Análisis de Visión Artificial (IA)</h3>
+                                <span class="ia-tag">Procesado por OpenCV</span>
+                            </div>
+                            <p class="ia-help-text">Suba una foto arriba para autocompletar.</p>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="RN26_grietas_IA">Grietas detectadas (IA)</label>
+                                    <select id="RN26_grietas_IA" name="RN26_grietas_IA" required class="ia-input">
+                                        <option value="0">Ninguna</option>
+                                        <option value="1">Fisuras capilares</option>
+                                        <option value="2">Leves</option>
+                                        <option value="3">Moderadas</option>
+                                        <option value="4">Severas</option>
+                                        <option value="5">Falla estructural</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="RN27_humedad_IA">Humedad detectada (IA)</label>
+                                    <select id="RN27_humedad_IA" name="RN27_humedad_IA" required class="ia-input">
+                                        <option value="0">Ninguna</option>
+                                        <option value="1">Manchas/Sudoración</option>
+                                        <option value="2">Humedad leve</option>
+                                        <option value="3">Filtración moderada</option>
+                                        <option value="4">Alta / Eflorescencia</option>
+                                        <option value="5">Saturación / Goteo</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="RN28_deformacion_IA">Deformación detectada (IA)</label>
+                                    <select id="RN28_deformacion_IA" name="RN28_deformacion_IA" required class="ia-input">
+                                        <option value="0">Nula</option>
+                                        <option value="1">Imperceptible al ojo</option>
+                                        <option value="2">Leve</option>
+                                        <option value="3">Moderada</option>
+                                        <option value="4">Grave</option>
+                                        <option value="5">Falla / Colapso inminente</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ACTIONS / NAVEGACION -->
+                    <div class="form-navigation">
+                        <button type="button" id="btn-prev" class="btn-nav" disabled>Anterior</button>
+                        <button type="button" id="btn-next" class="btn-nav">Siguiente</button>
+                        <button type="submit" id="btn-submit" class="btn-submit hidden">
+                            <span class="btn-text">Calcular Riesgo y Prioridad</span>
+                            <span class="btn-loading hidden"></span>
+                        </button>
+                    </div>
+
+                </form>
+
+            </section>
+
+            <!-- RIGHT COLUMN: RESULTS PANEL -->
+            <section class="card results-section" id="results-panel">
+                <!-- EMPTY STATE -->
+                <div class="results-empty" id="results-empty">
+                    <svg class="icon-empty-state" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z" />
+                    </svg>
+                    <h3>Esperando Evaluación</h3>
+                    <p>Complete el cuestionario técnico de 5 pestañas a la izquierda y presione <strong>Calcular Riesgo y Prioridad</strong>.</p>
+                    <p class="empty-tip">💡 Tip: Puedes arrastrar una foto de la edificación en la zona superior para pre-completar los datos de Visión Artificial.</p>
+                </div>
+
+                <!-- RESULTS DASHBOARD -->
+                <div class="results-dashboard hidden" id="results-content">
+                    <div class="results-header">
+                        <h3>Análisis Predictivo de la Red Neuronal</h3>
+                        <span class="timestamp" id="result-timestamp">Inspeccionado en vivo</span>
+                    </div>
+
+                    <!-- SCORE CONTAINER -->
+                    <div class="score-circle-wrapper">
+                        <svg class="score-ring" viewBox="0 0 120 120">
+                            <circle class="score-ring-bg" cx="60" cy="60" r="50"></circle>
+                            <circle class="score-ring-fill" id="gauge-fill" cx="60" cy="60" r="50"></circle>
+                        </svg>
+                        <div class="score-text">
+                            <span class="score-number" id="risk-score">0.0</span>
+                            <span class="score-label">Índice (RN29)</span>
+                        </div>
+                    </div>
+
+                    <!-- RISK LEVEL CARD -->
+                    <div class="risk-badge-card" id="risk-badge-card">
+                        <span class="risk-level-label">NIVEL DE RIESGO</span>
+                        <h4 class="risk-level-title" id="risk-level">CRÍTICO</h4>
+                    </div>
+
+                    <!-- RECOMMENDED ACTION CARD -->
+                    <div class="action-card" id="action-card">
+                        <div class="action-icon-wrapper">
+                            <svg class="icon-action" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.62.99-1.12 2.25-.42 3.26.71 1.03 2.14.73 3.01.21a11.1 11.1 0 0 0 3.3-3.3c.52-.87.82-2.3-.21-3.01-.7-.49-1.74-.2-2.52.42l-3.16 2.42Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 10.5h.008v.008H9V10.5ZM15 10.5h.008v.008H15V10.5ZM12 12v3" />
+                            </svg>
+                        </div>
+                        <div class="action-details">
+                            <h5 class="action-title" id="action-title">INSPECCIÓN INMEDIATA (24 horas)</h5>
+                            <p class="action-desc" id="action-desc">Activar protocolo de emergencia del GAMLP</p>
+                        </div>
+                    </div>
+
+                    <!-- METRICS GRID -->
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <span class="metric-label">Prioridad de Inspección</span>
+                            <div class="metric-value-wrapper">
+                                <span class="metric-value" id="priority-value">0.0</span>
+                                <span class="metric-max">/ 10</span>
+                            </div>
+                            <div class="progress-bar-wrapper">
+                                <div class="progress-bar-fill" id="priority-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <span class="metric-label">Confianza del Modelo</span>
+                            <div class="metric-value-wrapper">
+                                <span class="metric-value" id="confidence-value">0.0%</span>
+                            </div>
+                            <div class="progress-bar-wrapper">
+                                <div class="progress-bar-fill" id="confidence-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="results-actions">
+                        <button class="btn-print" onclick="window.print()">Imprimir Reporte</button>
+                        <button class="btn-reset" id="btn-reset-eval">Nueva Evaluación</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="app-footer">
+            <p>© 2026 Gobierno Autónomo Municipal de La Paz. Dirección de Prevención de Riesgos. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
