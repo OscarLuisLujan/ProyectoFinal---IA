@@ -5,7 +5,7 @@
 Este repositorio contiene un sistema inteligente diseñado para el **Gobierno Autónomo Municipal de La Paz (GAMLP)**. Su objetivo principal es optimizar, automatizar y priorizar las inspecciones de construcciones civiles mediante el uso de **Redes Neuronales Artificiales (RNA)** y **Visión Artificial**.
 
 ---
-##Grupo.
+## Grupo.
 * Choque Mamani Rosa Carolina
 * Torrez Limachi Ester Sarai
 * Lujan Nacho Oscar Luis
